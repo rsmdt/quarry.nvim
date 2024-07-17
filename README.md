@@ -1,4 +1,6 @@
-# `quarry.nvim`
+# quarry.nvim
+
+![LuaRocks](https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge)
 
 **quarry.nvim** is a plugin to simplify the setup of LSP and other tools for your **Neovim** configuration. It build on top of Mason to orchestrate lsp setup and tools (DAP, formatter, linter) installation.
 
@@ -322,3 +324,7 @@ return {
 ```
 
 
+## Development
+
+- use [`conventional-commits`](https://www.conventionalcommits.org/) as commit message to enable automatic versioning
+- refer to [`neorocks`](https://github.com/nvim-neorocks/sample-luarocks-plugin) to see how publishing to [luarocks](https://luarocks.org/) works
