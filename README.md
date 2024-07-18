@@ -2,15 +2,25 @@
 
 [![LuaRocks](https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge)](https://luarocks.org/modules/rudionrails/quarry.nvim)
 
-**quarry.nvim** is a plugin to simplify the setup of LSP and other tools for your **Neovim** configuration. It build on top of Mason to orchestrate lsp setup and tools (DAP, formatter, linter) installation.
+**quarry.nvim** is a wrapper for mason, mason-lspconfig, and lspconfig to orgnize LSP setup for **Neovim**.
 
-## ✨ Features
+## ✨ Rationale
 
-- Composable configuration that can be split for easier file management (best via lazy.nvim)
-- Configure `ensure_installed` to install all available tools in mason, via mason-lspconfig
-- Install LSP (and other mason tools) and attach lazily on selected `filetypes`
-- Passes `vim.lsp.protocol.make_client_capabilities()` as default capabilities to every LSP
-- Passes `on_attach` to every LSP
+Having multiple LSP can easily bloat your single-file configuration. You still want to manage LSP yourself so you still understand what is going on. So you need a simple way to split your setup into multiple files.
+
+### What quarry.nvim will do for you
+
+- Composable LSP configuration that is split into multiple files (best with lazy.nvim)
+- Lazily install LSP the first time you open a relevant file to keep your Neovim startup blazingly fast
+- Install additional tools without fuzz, ex. DAP, linter, formatter (⚠️ configuration of those is still with you)
+- Configures minimal LSP capabilities and server setup, which can all be overwritten if needed
+
+### What will quarry.nvim not do for you
+
+- it is not a swiss army knife solution with with a one-line setup to automagically manage all your Neovim LSP, DAP, formatter, and linter needs.
+
+> [!IMPORTANT]
+>  If you are not interested in managing your own configuration, then you better head over to [none-ls](https://github.com/nvimtools/none-ls.nvim) or [lsp-zero](https://github.com/VonHeikemen/lsp-zero.nvim).
 
 ## ⚡️Requirements
 
@@ -20,9 +30,6 @@
 - [`neovim/nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig)
 
 ## 📦 Installation
-
-> [!NOTE]
-> By default, this plugin only sets up the standard lsp capabilities for generic LSP. You need to read the Configuration section for more sophisticated setup.
 
 ### With [lazy.nvim](https://github.com/folke/lazy.nvim)
 
@@ -47,7 +54,7 @@ return {
 ## ⚙️ Configuration
 
 > [!NOTE]
-> You do not need to define this, the below only shows the default values.
+> The below shows the default configuration and you do not need to provide this explicitly.
 
 ```lua
 require("quarry").setup({
@@ -74,126 +81,22 @@ require("quarry").setup({
 })
 ```
 
-## 🚀 Additional Configuration Examples
-
-### Configure generic LSP options
-
-> [!TIP]
-> For explanations to `on_attach` and `capabilities` see `:h lspconfig-configurations`. Both
-> settings are totally optional.
-
-```lua
-require("quarry").setup({
-    ---
-    -- will be passed to every LSP. Alternatively, use `LspAttach` event.
-    on_attach = function(client, bufnr)
-        -- selectively add keymaps
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr, desc = "Show LSP hover" })
-
-        -- selectively enable inlayHint for attached client
-        if client.supports_method("textDocument/inlayHint") then
-            vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-        end
-    end,
-
-    ---
-    -- will be passed to every LSP.
-    -- NOTE: for the below example, make sure `cmp-nvim-lsp` is available
-    capabilities = function()
-        local cmp_nvim_lsp = require("hrsh7th/cmp-nvim-lsp")
-
-        return vim.tbl_deep_extend(
-            "force",
-            {},
-            vim.lsp.protocol.make_client_capabilities(),
-            cmp_nvim_lsp.default_capabilities()
-        )
-    end,
-})
-
-```
-
-### Override the default LSP setup function with your own
-
-```lua
-require("quarry").setup({
-    setup = {
-        _ = {
-            ---
-            -- Provide a fallback setup function. When defined, this will override the default
-            -- provided by quarry.nvim.
-            ---@type fun(name: string, opts: table<any any>)
-            setup = function(name, opts)
-                require("lspconfig")[name].setup(opts)
-            end,
-        },
-    },
-})
-```
-
-### Configure language servers
-
-```lua
-require("quarry").setup({
-    servers = {
-        ---
-        -- use the LSP name as a key (like you would for mason-lspconfig)
-        lua_ls = {
-
-            ---
-            -- Tools are installed only when opening such filetypes (lazily), otherwise thy are installed
-            -- upon `require("quarry").setup()`. The `filetypes` key is optional and unrelated to the 
-            -- filetypes option in the lspconfig package.
-            ---@type string[]
-            filetypes = { "lua" },
-
-            ---
-            -- Provide the tools to install. This allows for all available mason tools, not just LSP.
-            -- You can omit `lua_ls` in the below example, as it will be installed automatically. It is
-            -- taken for any LSP from the server key of the table.
-            ---@type string[]
-            ensure_installed = { "lua_ls", "stylua", "luacheck" },
-
-            ---
-            -- Pass the opts for the language server as you would with mason-lspconfig
-            ---@type table<any, any>
-            opts = {
-                settings = {
-                    Lua = {
-                        completion = { callSnippet = "Replace" },
-                        doc = { privateName = { "^_" } },
-                        codeLens = { enable = true },
-                        hint = { enable = true },
-                        workspace = { checkThirdParty = false },
-                    },
-
-                    -- Do not send telemetry data containing a randomized but unique identifier
-                    telemetry = { enable = false },
-                },
-            },
-
-            ---
-            -- Other LSP configurations will follow the same pattern, ex.
-            -- rust_analyzer = { ... }
-        },
-
-        setup = {
-            lua_ls = function(name, opts)
-                -- implement lua_ls specific LSP setup function. the default that comes
-                -- with quarry.nvim should suffice in most cases.
-            end
-        },
-    },
-})
-```
-
-### Composable configuration for many LSP (requires [lazy.nvim](https://github.com/folke/lazy.nvim))
+## 🚀 Composable configuration (best enjoyed with [lazy.nvim](https://github.com/folke/lazy.nvim))
 
 When you use many LSP, your configuration table may become quite large. You can take advantage of a lazy.nvim behaviour and separate the LSP into different files. lazy.nvim merges the `opts` in case a plugin is defined multiple times.
 
 > [!TIP]
+> `on_attach` and `capabilities` are optional. For details see `:h lspconfig-configurations` inside Neovim. Both settings are totally optional.
+
+> [!NOTE]
 > You can tweak the below example however you like. I found it most simple for the majority of purposes.
 
+inside your Neovim configuration directory, you will have:
+
+- `lua/plugins/lsp.lua` as your base setup
+- `lua/extras/lua.lua` for [Lua LSP](https://github.com/LuaLS/lua-language-server) specific configuration
+- `lua/extras/typescript.lua` for [Typescript LSP](https://github.com/typescript-language-server/typescript-language-server) specific configuration
+- ...extend with other LSP as you like
 
 1. Setup lazy.nvim and provide an additional `extras` spec.
 
@@ -209,7 +112,7 @@ require("lazy").setup({
 })
 ```
 
-2. Setup **quarry.nvim** inside the `plugins` directory, alongside your other lazy.nvim plugins.
+2. Setup **quarry.nvim** inside `lua/plugins/lsp.lua`, alongside your other lazy.nvim plugins.
 
 ```lua
 -- file: lua/plugins/quarry.lua
@@ -225,6 +128,8 @@ return {
         "hrsh7th/cmp-nvim-lsp",
     },
     opts = {
+        ---
+        -- will be passed to every LSP. Alternatively, use `LspAttach` event.
         on_attach = function(client, bufnr)
             -- Enable completion triggered by <c-x><c-o>
             vim.bo[bufnr].omnifunc = "v:lua.vim.lsp.omnifunc"
@@ -251,6 +156,8 @@ return {
             end, "Toggle inlay [h]int")
         end,
 
+        ---
+        -- will be passed to every LSP.
         capabilities = function()
             local cmp_nvim_lsp = require("hrsh7th/cmp-nvim-lsp")
 
@@ -266,11 +173,10 @@ return {
 
 ```
 
-3. Setup LSP inside `extras` directory.
+3. Setup Lua and Typescript LSP inside `lua/extras/lua.lua` and `lua/extras/typescript.lua`.
 
 ```lua
 -- file: lua/extras/lua.lua
-
 return {
     "rudionrails/quarry.nvim",
     opts = {
@@ -314,7 +220,6 @@ return {
 
 ```lua
 -- file: lua/extras/typescript.lua
-
 return {
     "rudionrails/quarry.nvim",
     opts = {
@@ -356,7 +261,10 @@ return {
 }
 
 ```
+## Similar projects
 
+- [`astrolsp`](https://github.com/AstroNvim/astrolsp)
+- [`lsp-setup`](https://github.com/junnplus/lsp-setup.nvim)
 
 ## Development
 
