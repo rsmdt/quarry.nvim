@@ -98,7 +98,8 @@ inside your Neovim configuration directory, you will have:
 - `lua/extras/typescript.lua` for [Typescript LSP](https://github.com/typescript-language-server/typescript-language-server) specific configuration
 - ...extend with other LSP as you like
 
-1. Setup lazy.nvim and provide an additional `extras` spec.
+<details>
+<summary>Setup lazy.nvim and provide additional extras spec</summary>
 
 ```lua
 -- file: lua/init.lua
@@ -111,8 +112,10 @@ require("lazy").setup({
     -- .. regular lazy.nvim configuration ...
 })
 ```
+</details>
 
-2. Setup **quarry.nvim** inside `lua/plugins/lsp.lua`, alongside your other lazy.nvim plugins.
+<details>
+<summary>Setup **quarry.nvim** in `lua/plugins/lsp.lua`</summary>
 
 ```lua
 -- file: lua/plugins/quarry.lua
@@ -172,8 +175,10 @@ return {
 }
 
 ```
+</details>
 
-3. Setup Lua and Typescript LSP inside `lua/extras/lua.lua` and `lua/extras/typescript.lua`.
+<details>
+<summary>Setup lua-language-server in `lua/extras/lua.lua`</summary>
 
 ```lua
 -- file: lua/extras/lua.lua
@@ -215,8 +220,12 @@ return {
         },
     },
 }
-
 ```
+</details>
+
+
+<details>
+<summary>Setup typescript-language-server in `lua/extras/typescript.lua`</summary>
 
 ```lua
 -- file: lua/extras/typescript.lua
@@ -261,6 +270,8 @@ return {
 }
 
 ```
+</details>
+
 ## Similar projects
 
 - [`astrolsp`](https://github.com/AstroNvim/astrolsp)
