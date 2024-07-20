@@ -1,18 +1,15 @@
-# quarry.nvim
-
 <div align="center">
     <a href="https://github.com/rudionrails/quarry.nvim/releases/latest">
-        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/rudionrails/quarry.nvim?style=for-the-badge&logo=semver">
+        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/rudionrails/quarry.nvim?style=for-the-badge&logo=semver" />
     </a>
-
     <a href="https://luarocks.org/modules/rudionrails/quarry.nvim">
-        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge&logo=lua">
+        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge&logo=lua" />
     <a/>
-
     <a href="https://github.com/rudionrails/quarry.nvim/blob/main/LICENSE">
-        <img alt="License" src="https://img.shields.io/github/license/rudionrails/quarry.nvim?style=for-the-badge&logo=apache">
+        <img alt="License" src="https://img.shields.io/github/license/rudionrails/quarry.nvim?style=for-the-badge&logo=apache" />
     </a>
 </div>
+
 
 **quarry.nvim** is a wrapper for mason, mason-lspconfig, and lspconfig to orgnize LSP setup for **Neovim**.
 
