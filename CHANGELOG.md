@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0](https://github.com/rudionrails/quarry.nvim/compare/v2.0.0...v2.1.0) (2024-07-23)
+
+
+### Features
+
+* Adds ability to provide feature preset, list or granular detailed definitions ([a15099e](https://github.com/rudionrails/quarry.nvim/commit/a15099e1df6cc94e2882a46f3c567e3e835656ad))
+* Adds configurable lsp.Client features ([3368ec0](https://github.com/rudionrails/quarry.nvim/commit/3368ec0f52481484330cfb3d12ca6e3c3076581b))
+
 ## [2.0.0](https://github.com/rudionrails/quarry.nvim/compare/v1.1.0...v2.0.0) (2024-07-18)
 
 
