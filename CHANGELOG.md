@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/rudionrails/quarry.nvim/compare/v2.1.0...v2.2.0) (2024-07-27)
+
+
+### Features
+
+* Adds Lazy-like keys feature to attach to buffer ([cd95f95](https://github.com/rudionrails/quarry.nvim/commit/cd95f952b0c4e68116937545e69c9d760b4d0c00))
+
 ## [2.1.0](https://github.com/rudionrails/quarry.nvim/compare/v2.0.0...v2.1.0) (2024-07-23)
 
 
