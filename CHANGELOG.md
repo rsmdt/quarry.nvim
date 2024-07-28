@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.3.0](https://github.com/rudionrails/quarry.nvim/compare/v2.2.0...v2.3.0) (2024-07-28)
+
+
+### Features
+
+* keymap rhs do not get client & buffer passed ([e08b067](https://github.com/rudionrails/quarry.nvim/commit/e08b067b7387f127ded523e4746763cf40a6a22a))
+
 ## [2.2.0](https://github.com/rudionrails/quarry.nvim/compare/v2.1.0...v2.2.0) (2024-07-27)
 
 
