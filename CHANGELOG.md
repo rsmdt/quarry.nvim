@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.1](https://github.com/rudionrails/quarry.nvim/compare/v3.0.0...v3.0.1) (2024-09-23)
+
+
+### Bug Fixes
+
+* Removes print debugging statement ([2e14685](https://github.com/rudionrails/quarry.nvim/commit/2e14685a6c9c1ca0478db272028059ec22eb807e))
+* when package is not available in Mason, then display a message instead of throwing an error ([01e2ca6](https://github.com/rudionrails/quarry.nvim/commit/01e2ca627f415167f3a3ef740cf558e2037d7df7))
+
 ## [3.0.0](https://github.com/rudionrails/quarry.nvim/compare/v2.3.0...v3.0.0) (2024-09-23)
 
 
