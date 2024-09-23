@@ -1,5 +1,18 @@
 # Changelog
 
+## [3.0.0](https://github.com/rudionrails/quarry.nvim/compare/v2.3.0...v3.0.0) (2024-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes lsp feature presets
+* Keys are now key-value pairs, not index-based tables
+
+### Features
+
+* Keys are now key-value pairs, not index-based tables ([f8767d5](https://github.com/rudionrails/quarry.nvim/commit/f8767d5bd9413b9c9074acd42050ee31087682cb))
+* Removes lsp feature presets ([f25aef8](https://github.com/rudionrails/quarry.nvim/commit/f25aef826d620b7e393d99cb673a394b9cc67b76))
+
 ## [2.3.0](https://github.com/rudionrails/quarry.nvim/compare/v2.2.0...v2.3.0) (2024-07-28)
 
 
