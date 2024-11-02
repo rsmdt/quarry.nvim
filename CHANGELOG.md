@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.0.0](https://github.com/rudionrails/quarry.nvim/compare/v3.0.1...v4.0.0) (2024-11-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* installer is not lazy by default, can be added with 'lazy = true'
+* renames 'ensure_insgalled' to 'tools' for consistency
+* server 'opts' is renamed to 'config'
+
+### Features
+
+* installer is not lazy by default, can be added with 'lazy = true' ([57567c3](https://github.com/rudionrails/quarry.nvim/commit/57567c3d338fae08f65535035b5e8d5d05533d57))
+* renames 'ensure_insgalled' to 'tools' for consistency ([7171598](https://github.com/rudionrails/quarry.nvim/commit/7171598d878e94b2849e62aef7ae6ba8a8632f28))
+* server 'opts' is renamed to 'config' ([276f89f](https://github.com/rudionrails/quarry.nvim/commit/276f89f7fc240a50a9d8e0dc14f28a79562e8fd7))
+
 ## [3.0.1](https://github.com/rudionrails/quarry.nvim/compare/v3.0.0...v3.0.1) (2024-09-23)
 
 
