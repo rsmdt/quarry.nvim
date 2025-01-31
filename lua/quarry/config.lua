@@ -74,24 +74,12 @@ function M.setup(opts)
 
 	-- setup servers from `servers` option
 	mason_lspconfig.setup({
+		ensure_installed = {},
+		automatic_installation = false,
 		handlers = {
 			function(name)
 				local setup = config.setup[name] or config.setup["_"]
 				local server = vim.tbl_deep_extend("force", {}, u._server_defaults, config.servers[name] or {})
-
-				--  TODO: remove this for next major release
-				if type(server.opts) == "table" then
-					u.notify(
-						table.concat({
-							string.format("DEPRECATION for your '%s' configuration:", name),
-							"  - `opts` has been renamed, use `config` instead.",
-							"",
-						}, "\n"),
-						vim.log.levels.WARN
-					)
-
-					server.config = vim.tbl_deep_extend("force", server.config, server.opts)
-				end
 
 				local server_config = vim.tbl_deep_extend("force", {
 					capabilities = capabilities,
