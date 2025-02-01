@@ -74,8 +74,6 @@ function M.setup(opts)
 
 	-- setup servers from `servers` option
 	mason_lspconfig.setup({
-		ensure_installed = {},
-		automatic_installation = false,
 		handlers = {
 			function(name)
 				local setup = config.setup[name] or config.setup["_"]
