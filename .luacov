@@ -1,0 +1,23 @@
+-- Configuration file for LuaCov
+return {
+  -- Filename to store stats collected
+  statsfile = "luacov.stats.out",
+
+  -- Filename to store report
+  reportfile = "luacov.report.out",
+
+  -- Run reporter on completion? (won't work for long running processes)
+  runreport = false,
+
+  -- Modules to include in the report
+  include = {
+    "quarry$",
+    "quarry/.+$"
+  },
+
+  -- Modules to exclude from the report
+  exclude = {
+    "tests",
+    "tests/.+_spec"
+  }
+}

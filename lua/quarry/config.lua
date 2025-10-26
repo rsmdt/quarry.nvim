@@ -39,15 +39,32 @@ M.defaults = {
 	servers = {},
 
 	---
-	-- Default setup function assumes lspconfig, but will gracefully do nothing if not available,
-	-- so that you can override with your custom implementation.
+	-- Default setup function supports both NeoVim 0.11+ native API and legacy lspconfig.
+	-- Automatically detects and uses the appropriate method.
 	---@type table<string, fun(nane: string, opts: table<any, any>)>
 	setup = {
 		_ = function(name, opts)
-			local ok, lspconfig = pcall(require, "lspconfig")
+			-- NeoVim 0.11+ native API support
+			if vim.lsp.config and vim.lsp.enable then
+				-- Use native LSP configuration API
+				vim.lsp.config(name, opts)
+				vim.lsp.enable(name)
+				return
+			end
 
+			-- Fallback to legacy lspconfig for NeoVim 0.10 or when explicitly using lspconfig
+			local ok, lspconfig = pcall(require, "lspconfig")
 			if ok then
 				lspconfig[name].setup(opts)
+			else
+				-- Neither native API nor lspconfig available
+				u.notify(
+					string.format(
+						'Unable to setup "%s": NeoVim 0.11+ native API not available and lspconfig not found',
+						name
+					),
+					vim.log.levels.ERROR
+				)
 			end
 		end,
 	},

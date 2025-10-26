@@ -36,7 +36,16 @@ Having multiple LSP can easily bloat your single-file configuration. You still w
 - [`Neovim`](https://neovim.io/) >= 0.10.0
 - [`williamboman/mason.nvim`](https://github.com/williamboman/mason.nvim)
 - [`williamboman/mason-lspconfig.nvim`](https://github.com/williamboman/mason-lspconfig.nvim)
-- [`neovim/nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) >= 1.0.0
+- [`neovim/nvim-lspconfig`](https://github.com/neovim/nvim-lspconfig) >= 1.0.0 (optional for NeoVim 0.11+)
+
+### Version Compatibility
+
+| NeoVim Version | nvim-lspconfig | Notes |
+|----------------|----------------|-------|
+| 0.10.x | Required | Uses legacy lspconfig API |
+| 0.11+ | Optional | Can use native `vim.lsp.config()` API |
+
+For NeoVim 0.11+, quarry.nvim automatically detects and uses the native LSP configuration API (`vim.lsp.config` and `vim.lsp.enable`). You can still use nvim-lspconfig if you prefer, and quarry.nvim will work seamlessly with both approaches.
 
 ## 📦 Installation
 
@@ -50,9 +59,9 @@ return {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
 
-            -- the default server config assumes that you use lspconfig. If this is not the case,
-            -- you can omit this and override with your own implementaiotn (see below examples).
-            -- quarry.nvim will gracefully handle if lspconfig is not available.
+            -- Optional for NeoVim 0.11+: quarry.nvim automatically uses the native
+            -- vim.lsp.config() API when available. For NeoVim 0.10, lspconfig is required.
+            -- You can also override with your own implementation (see examples below).
             "neovim/nvim-lspconfig"
         },
     }
@@ -79,7 +88,7 @@ require("quarry").setup({
     ---
     -- Define the keymaps to be set for the buffer when the LSP attaches. The
     -- syntax is similar to Lazy nvim.
-    -- 
+    --
     -- Examples:
     --   ["[d"] = { vim.diagnostic.goto_prev },
     --   ["]d"] = { vim.diagnostic.goto_next },
@@ -103,7 +112,7 @@ require("quarry").setup({
 
     ---
     -- Provide specific LSP configuration here. Every config can have the following shape:
-    -- 	
+    --
     -- servers = {
     --   lua_ls = {
 	--     -- Specify the filetypes when to install the tools
@@ -124,8 +133,20 @@ require("quarry").setup({
     ---
     -- Provide LSP-specific handler functions or override the default. A setup handler with `_`
     -- as the key will be used as default if no LSP-specific one is defined.
+    --
+    -- The default handler automatically detects and uses:
+    --   - NeoVim 0.11+ native API (vim.lsp.config + vim.lsp.enable) when available
+    --   - Legacy lspconfig API for NeoVim 0.10 or when explicitly using lspconfig
     setup = {
         _ = function(name, opts)
+            -- NeoVim 0.11+ native API
+            if vim.lsp.config and vim.lsp.enable then
+                vim.lsp.config(name, opts)
+                vim.lsp.enable(name)
+                return
+            end
+
+            -- Fallback to lspconfig
             local ok, lspconfig = pcall(require, "lspconfig")
             if ok then
                 lspconfig[name].setup(opts)
@@ -173,7 +194,7 @@ return {
         -- load modules from within /lua/plugins/extras/*
         --
         -- Alternatively, you can add this to lua/init.lua:
-        --  
+        --
         --   -- ... require lazy.nvim as you usually would. Check out the documentation for detailed instructions ...
         --   require("lazy").setup({
         --       { import = "plugins" },
@@ -331,10 +352,179 @@ return {
 
 ## Similar projects
 
-- [`astrolsp`](https://github.com/AstroNvim/astrolsp) 
+- [`astrolsp`](https://github.com/AstroNvim/astrolsp)
 - [`lsp-setup`](https://github.com/junnplus/lsp-setup.nvim)
 
 ## Development
 
-- use [`conventional-commits`](https://www.conventionalcommits.org/) as commit message to enable automatic versioning
-- refer to [`neorocks`](https://github.com/nvim-neorocks/sample-luarocks-plugin) to see how publishing to [luarocks](https://luarocks.org/) works
+### Prerequisites
+
+- Neovim >= 0.10.0
+- [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) (for testing)
+- Lua 5.1+ (for syntax checking)
+
+### Running Tests
+
+quarry.nvim includes a comprehensive test suite to ensure compatibility across NeoVim versions.
+
+#### Quick Verification
+
+Run the implementation verification script:
+
+```bash
+nvim --headless -u tests/verify_implementation.lua
+```
+
+This will verify:
+- Version detection module
+- Setup handler logic
+- Compatibility with your NeoVim version
+
+#### Using the Makefile
+
+```bash
+# Run all tests
+make test
+
+# Run tests in isolation (with minimal init)
+make isolated
+
+# Run tests with coverage (requires luacov)
+make coverage
+
+# Format code with stylua
+make format
+```
+
+#### Manual Test Execution
+
+Using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim):
+
+```bash
+# Run all tests
+nvim --headless --noplugin -u tests/setup.lua \
+  -c "lua require('plenary.busted').run('tests/')" \
+  -c "qa"
+
+# Run specific test file
+nvim --headless --noplugin -u tests/setup.lua \
+  -c "lua require('plenary.busted').run('tests/version_spec.lua')" \
+  -c "qa"
+```
+
+#### Test Structure
+
+```
+tests/
+├── setup.lua              # Minimal test environment
+├── verify_implementation.lua  # Comprehensive verification
+├── version_spec.lua       # Version detection tests
+├── config_spec.lua        # Config module tests
+└── installer_spec.lua     # Installer module tests
+```
+
+### Code Quality
+
+#### Syntax Checking
+
+Check Lua syntax for all modules:
+
+```bash
+# Check all files
+for file in lua/quarry/*.lua; do
+  luac -p "$file" && echo "✓ $(basename $file) OK"
+done
+
+# Or check a specific file
+luac -p lua/quarry/config.lua
+```
+
+#### Linting and Formatting
+
+```bash
+# Format code with stylua (if installed)
+stylua lua/ tests/
+
+# Check formatting without modifying
+stylua --check lua/ tests/
+```
+
+### Project Structure
+
+```
+quarry.nvim/
+├── lua/
+│   └── quarry/
+│       ├── config.lua      # Main configuration and setup
+│       ├── installer.lua   # Mason tool installation
+│       ├── features.lua    # LSP feature management
+│       ├── keymaps.lua     # LSP keymap setup
+│       ├── utils.lua       # Utility functions
+│       └── version.lua     # Version detection (0.11+ compat)
+├── tests/
+│   ├── setup.lua           # Test environment
+│   ├── verify_implementation.lua
+│   ├── version_spec.lua
+│   ├── config_spec.lua
+│   └── installer_spec.lua
+├── docs/
+│   └── analysis/           # Implementation analysis docs
+├── README.md
+└── Makefile
+```
+
+### Version Compatibility
+
+quarry.nvim automatically detects and adapts to your NeoVim version:
+
+- **NeoVim 0.10.x**: Uses legacy `lspconfig` API
+- **NeoVim 0.11+**: Uses native `vim.lsp.config()` and `vim.lsp.enable()` APIs
+
+You can check the detected configuration method:
+
+```lua
+local version = require("quarry.version")
+print(version.get_lsp_config_method()) -- "native" or "lspconfig"
+print(vim.inspect(version.get_debug_info()))
+```
+
+### Contributing
+
+When contributing to quarry.nvim:
+
+1. **Use conventional commits** for automatic versioning:
+   - `feat:` - New features
+   - `fix:` - Bug fixes
+   - `docs:` - Documentation changes
+   - `test:` - Test additions or modifications
+   - `refactor:` - Code refactoring
+   - `chore:` - Maintenance tasks
+
+2. **Run tests** before submitting:
+   ```bash
+   make test
+   nvim --headless -u tests/verify_implementation.lua
+   ```
+
+3. **Check syntax**:
+   ```bash
+   luac -p lua/quarry/*.lua
+   ```
+
+4. **Update documentation** if adding features or changing APIs
+
+5. **Maintain backwards compatibility** - avoid breaking changes in minor versions
+
+### Publishing
+
+For maintainers publishing to [luarocks](https://luarocks.org/):
+
+- Refer to [`neorocks`](https://github.com/nvim-neorocks/sample-luarocks-plugin) for the publishing workflow
+- Use conventional commits to trigger automatic versioning
+- Ensure all tests pass before tagging a release
+
+### Additional Resources
+
+- [Full Analysis: NeoVim 0.11 Migration](docs/analysis/neovim-0.11-lsp-migration.md)
+- [Implementation Guide](docs/analysis/implementation-guide.md)
+- [Quick Reference](docs/analysis/quick-reference.md)

@@ -32,13 +32,29 @@ local _install = function(tools)
 	end
 end
 
----@param name: string
+---Get filetypes for a language server
+---Tries native vim.lsp.config first (NeoVim 0.11+), then falls back to lspconfig
+---@param name string The language server name
+---@return string[] Array of filetypes
 local _filetypes_for = function(name)
-	local ok, config = pcall(require, "lspconfig.configs." .. name)
-	if ok and type(config.default_config) == "table" then
-		return config.default_config.filetypes or {}
+	-- Strategy 1: Try native NeoVim 0.11+ API
+	if vim.lsp.config and type(vim.lsp.config[name]) == "table" then
+		local native_config = vim.lsp.config[name]
+		if native_config.filetypes and #native_config.filetypes > 0 then
+			return native_config.filetypes
+		end
 	end
 
+	-- Strategy 2: Try lspconfig module
+	local ok, config = pcall(require, "lspconfig.configs." .. name)
+	if ok and type(config.default_config) == "table" then
+		local filetypes = config.default_config.filetypes or {}
+		if #filetypes > 0 then
+			return filetypes
+		end
+	end
+
+	-- Strategy 3: Return empty array (safe fallback)
 	return {}
 end
 
