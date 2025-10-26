@@ -1,5 +1,22 @@
 # Changelog
 
+## [5.0.0](https://github.com/rsmdt/quarry.nvim/compare/v4.0.0...v5.0.0) (2025-10-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* Removes fallbacks for deprecations
+
+### Features
+
+* add NeoVim 0.11 native LSP API support ([fa8093e](https://github.com/rsmdt/quarry.nvim/commit/fa8093e630e6603354a982896242eaba6e00a9a2))
+* Removes fallbacks for deprecations ([dc57a5d](https://github.com/rsmdt/quarry.nvim/commit/dc57a5d15fdc867abb45dfe0d917b2642252fa91))
+
+
+### Bug Fixes
+
+* reverts mason default config ([09508eb](https://github.com/rsmdt/quarry.nvim/commit/09508eb7fdcdcbe2e1f91909fbb295a08979f1d9))
+
 ## [4.0.0](https://github.com/rudionrails/quarry.nvim/compare/v3.0.1...v4.0.0) (2024-11-02)
 
 
