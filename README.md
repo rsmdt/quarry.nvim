@@ -1,12 +1,12 @@
 <div align="center">
-    <a href="https://github.com/rudionrails/quarry.nvim/releases/latest">
-        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/rudionrails/quarry.nvim?style=for-the-badge&logo=semver" />
+    <a href="https://github.com/rsmdt/quarry.nvim/releases/latest">
+        <img alt="GitHub Release" src="https://img.shields.io/github/v/release/rsmdt/quarry.nvim?style=for-the-badge&logo=semver" />
     </a>
-    <a href="https://luarocks.org/modules/rudionrails/quarry.nvim">
-        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge&logo=lua" />
+    <a href="https://luarocks.org/modules/rsmdt/quarry.nvim">
+        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rsmdt/quarry.nvim?style=for-the-badge&logo=lua" />
     <a/>
-    <a href="https://github.com/rudionrails/quarry.nvim/blob/main/LICENSE">
-        <img alt="License" src="https://img.shields.io/github/license/rudionrails/quarry.nvim?style=for-the-badge&logo=apache" />
+    <a href="https://github.com/rsmdt/quarry.nvim/blob/main/LICENSE">
+        <img alt="License" src="https://img.shields.io/github/license/rsmdt/quarry.nvim?style=for-the-badge&logo=apache" />
     </a>
 </div>
 
@@ -54,7 +54,7 @@ For NeoVim 0.11+, quarry.nvim automatically detects and uses the native LSP conf
 ```lua
 return {
     {
-        "rudionrails/quarry.nvim",
+        "rsmdt/quarry.nvim",
         dependencies = {
             "williamboman/mason.nvim",
             "williamboman/mason-lspconfig.nvim",
@@ -179,7 +179,7 @@ inside your Neovim configuration directory, you will have:
 ```lua
 -- file: lua/plugins/quarry.lua
 return {
-    "rudionrails/quarry.nvim",
+    "rsmdt/quarry.nvim",
     event = "VeryLazy",
     dependencies = {
         "williamboman/mason.nvim",
@@ -262,7 +262,7 @@ return {
 ```lua
 -- file: lua/plugins/extras/lua.lua
 return {
-    "rudionrails/quarry.nvim",
+    "rsmdt/quarry.nvim",
     config = {
         servers = {
             lua_ls = {
@@ -314,7 +314,7 @@ return {
 ```lua
 -- file: lua/plugins/extras/typescript.lua
 return {
-    "rudionrails/quarry.nvim",
+    "rsmdt/quarry.nvim",
     config = {
         servers = {
             ts_ls = {
