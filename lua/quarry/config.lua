@@ -89,22 +89,40 @@ function M.setup(opts)
 		config.on_attach(client, bufnr)
 	end
 
+	-- Build and apply the configuration for a single server. Used by both the
+	-- mason-lspconfig v1 (handlers) and v2 (direct) code paths below.
+	local function configure(name)
+		local setup = config.setup[name] or config.setup["_"]
+		local server = vim.tbl_deep_extend("force", {}, u._server_defaults, config.servers[name] or {})
+
+		local server_config = vim.tbl_deep_extend("force", {
+			capabilities = capabilities,
+			on_attach = on_attach,
+		}, server.config or {})
+
+		setup(name, server_config)
+	end
+
 	-- setup servers from `servers` option
-	mason_lspconfig.setup({
-		handlers = {
-			function(name)
-				local setup = config.setup[name] or config.setup["_"]
-				local server = vim.tbl_deep_extend("force", {}, u._server_defaults, config.servers[name] or {})
+	if type(mason_lspconfig.setup_handlers) == "function" then
+		-- mason-lspconfig v1: the default handler runs for every installed server.
+		mason_lspconfig.setup({
+			handlers = {
+				function(name)
+					configure(name)
+				end,
+			},
+		})
+	else
+		-- mason-lspconfig v2 removed the `handlers`/`setup_handlers` mechanism.
+		-- Configure the installed servers directly; `automatic_enable = false`
+		-- leaves enabling to our setup handler (vim.lsp.config + vim.lsp.enable).
+		mason_lspconfig.setup({ automatic_enable = false })
 
-				local server_config = vim.tbl_deep_extend("force", {
-					capabilities = capabilities,
-					on_attach = on_attach,
-				}, server.config or {})
-
-				setup(name, server_config)
-			end,
-		},
-	})
+		for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
+			configure(name)
+		end
+	end
 
 	-- install tools
 	installer.setup(config)

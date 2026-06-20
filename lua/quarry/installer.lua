@@ -10,24 +10,20 @@ local _installed_by_quarry = {}
 
 ---@param tools string[]
 local _install = function(tools)
+	-- mason-lspconfig v2 renamed `lspconfig_to_mason` -> `lspconfig_to_package`.
+	local mappings = mason_lspconfig.get_mappings()
+	local lspconfig_to_package = mappings.lspconfig_to_package or mappings.lspconfig_to_mason or {}
+
 	for _, tool in ipairs(tools) do
-		do
-			if tool == nil then
-				break
-			end
+		local name = lspconfig_to_package[tool] or tool
+		local has_package, p = pcall(mason_registry.get_package, name)
 
-			local name = mason_lspconfig.get_mappings().lspconfig_to_mason[tool] or tool
-			local has_package, p = pcall(mason_registry.get_package, name)
-
-			if not has_package then
-				u.notify(string.format('"%s" not found in Mason registry.', name), vim.log.levels.WARN)
-				break
-			end
-
-			if not p:is_installed() then
-				_installed_by_quarry[p.name] = true
-				p:install()
-			end
+		if not has_package then
+			-- skip this tool only; a missing package must not abort the rest
+			u.notify(string.format('"%s" not found in Mason registry.', name), vim.log.levels.WARN)
+		elseif not p:is_installed() then
+			_installed_by_quarry[p.name] = true
+			p:install()
 		end
 	end
 end
