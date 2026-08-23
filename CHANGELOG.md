@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1](https://github.com/rsmdt/quarry.nvim/compare/v5.0.0...v5.0.1) (2026-08-23)
+
+
+### Performance Improvements
+
+* defer LSP setup and tool installation off the startup path ([6446f5e](https://github.com/rsmdt/quarry.nvim/commit/6446f5e73d335a2f55fc7a3d0008ece47f0083f3))
+
 ## [5.0.0](https://github.com/rsmdt/quarry.nvim/compare/v4.0.0...v5.0.0) (2026-06-20)
 
 
