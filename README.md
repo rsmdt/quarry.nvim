@@ -2,8 +2,8 @@
     <a href="https://github.com/rsmdt/quarry.nvim/releases/latest">
         <img alt="GitHub Release" src="https://img.shields.io/github/v/release/rsmdt/quarry.nvim?style=for-the-badge&logo=semver" />
     </a>
-    <a href="https://luarocks.org/modules/rsmdt/quarry.nvim">
-        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rsmdt/quarry.nvim?style=for-the-badge&logo=lua" />
+    <a href="https://luarocks.org/modules/rudionrails/quarry.nvim">
+        <img alt="LuaRocks Package" src="https://img.shields.io/luarocks/v/rudionrails/quarry.nvim?style=for-the-badge&logo=lua" />
     <a/>
     <a href="https://github.com/rsmdt/quarry.nvim/blob/main/LICENSE">
         <img alt="License" src="https://img.shields.io/github/license/rsmdt/quarry.nvim?style=for-the-badge&logo=apache" />
@@ -361,170 +361,35 @@ return {
 
 - Neovim >= 0.10.0
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) (for testing)
-- Lua 5.1+ (for syntax checking)
 
-### Running Tests
+### Common tasks
 
-quarry.nvim includes a comprehensive test suite to ensure compatibility across NeoVim versions.
+```bash
+make test        # Run all tests
+make isolated    # Run tests with minimal init
+make coverage    # Run tests with coverage (requires luacov)
+make format      # Format code with stylua
+```
 
-#### Quick Verification
-
-Run the implementation verification script:
+Verify the implementation against your NeoVim version:
 
 ```bash
 nvim --headless -u tests/verify_implementation.lua
 ```
 
-This will verify:
-- Version detection module
-- Setup handler logic
-- Compatibility with your NeoVim version
-
-#### Using the Makefile
-
-```bash
-# Run all tests
-make test
-
-# Run tests in isolation (with minimal init)
-make isolated
-
-# Run tests with coverage (requires luacov)
-make coverage
-
-# Format code with stylua
-make format
-```
-
-#### Manual Test Execution
-
-Using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim):
-
-```bash
-# Run all tests
-nvim --headless --noplugin -u tests/setup.lua \
-  -c "lua require('plenary.busted').run('tests/')" \
-  -c "qa"
-
-# Run specific test file
-nvim --headless --noplugin -u tests/setup.lua \
-  -c "lua require('plenary.busted').run('tests/version_spec.lua')" \
-  -c "qa"
-```
-
-#### Test Structure
-
-```
-tests/
-├── setup.lua              # Minimal test environment
-├── verify_implementation.lua  # Comprehensive verification
-├── version_spec.lua       # Version detection tests
-├── config_spec.lua        # Config module tests
-└── installer_spec.lua     # Installer module tests
-```
-
-### Code Quality
-
-#### Syntax Checking
-
-Check Lua syntax for all modules:
-
-```bash
-# Check all files
-for file in lua/quarry/*.lua; do
-  luac -p "$file" && echo "✓ $(basename $file) OK"
-done
-
-# Or check a specific file
-luac -p lua/quarry/config.lua
-```
-
-#### Linting and Formatting
-
-```bash
-# Format code with stylua (if installed)
-stylua lua/ tests/
-
-# Check formatting without modifying
-stylua --check lua/ tests/
-```
-
-### Project Structure
-
-```
-quarry.nvim/
-├── lua/
-│   └── quarry/
-│       ├── config.lua      # Main configuration and setup
-│       ├── installer.lua   # Mason tool installation
-│       ├── features.lua    # LSP feature management
-│       ├── keymaps.lua     # LSP keymap setup
-│       ├── utils.lua       # Utility functions
-│       └── version.lua     # Version detection (0.11+ compat)
-├── tests/
-│   ├── setup.lua           # Test environment
-│   ├── verify_implementation.lua
-│   ├── version_spec.lua
-│   ├── config_spec.lua
-│   └── installer_spec.lua
-├── docs/
-│   └── analysis/           # Implementation analysis docs
-├── README.md
-└── Makefile
-```
-
-### Version Compatibility
+### Version compatibility
 
 quarry.nvim automatically detects and adapts to your NeoVim version:
 
-- **NeoVim 0.10.x**: Uses legacy `lspconfig` API
-- **NeoVim 0.11+**: Uses native `vim.lsp.config()` and `vim.lsp.enable()` APIs
-
-You can check the detected configuration method:
+- **NeoVim 0.10.x**: legacy `lspconfig` API
+- **NeoVim 0.11+**: native `vim.lsp.config()` / `vim.lsp.enable()`
 
 ```lua
-local version = require("quarry.version")
-print(version.get_lsp_config_method()) -- "native" or "lspconfig"
-print(vim.inspect(version.get_debug_info()))
+print(require("quarry.version").get_lsp_config_method()) -- "native" or "lspconfig"
 ```
 
 ### Contributing
 
-When contributing to quarry.nvim:
-
-1. **Use conventional commits** for automatic versioning:
-   - `feat:` - New features
-   - `fix:` - Bug fixes
-   - `docs:` - Documentation changes
-   - `test:` - Test additions or modifications
-   - `refactor:` - Code refactoring
-   - `chore:` - Maintenance tasks
-
-2. **Run tests** before submitting:
-   ```bash
-   make test
-   nvim --headless -u tests/verify_implementation.lua
-   ```
-
-3. **Check syntax**:
-   ```bash
-   luac -p lua/quarry/*.lua
-   ```
-
-4. **Update documentation** if adding features or changing APIs
-
-5. **Maintain backwards compatibility** - avoid breaking changes in minor versions
-
-### Publishing
-
-For maintainers publishing to [luarocks](https://luarocks.org/):
-
-- Refer to [`neorocks`](https://github.com/nvim-neorocks/sample-luarocks-plugin) for the publishing workflow
-- Use conventional commits to trigger automatic versioning
-- Ensure all tests pass before tagging a release
-
-### Additional Resources
-
-- [Full Analysis: NeoVim 0.11 Migration](docs/analysis/neovim-0.11-lsp-migration.md)
-- [Implementation Guide](docs/analysis/implementation-guide.md)
-- [Quick Reference](docs/analysis/quick-reference.md)
+- Use conventional commits (`feat:`, `fix:`, `docs:`, ...) — releases are versioned automatically
+- Run `make test` before submitting
+- Maintain backwards compatibility in minor versions

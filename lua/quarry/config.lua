@@ -1,6 +1,3 @@
-local mason_lspconfig = require("mason-lspconfig")
-
-local installer = require("quarry.installer")
 local u = require("quarry.utils")
 
 local M = {}
@@ -81,7 +78,15 @@ function M.setup(opts)
 	end
 
 	local config = vim.tbl_deep_extend("force", {}, M.defaults, opts or {})
-	local capabilities = type(config.capabilities) == "function" and config.capabilities() or config.capabilities
+
+	local _capabilities
+	local capabilities = function()
+		if _capabilities == nil then
+			_capabilities = type(config.capabilities) == "function" and config.capabilities() or config.capabilities
+		end
+		return _capabilities
+	end
+
 	local on_attach = function(client, bufnr)
 		require("quarry.features").setup(client, bufnr, config.features)
 		require("quarry.keymaps").setup(client, bufnr, config.keys)
@@ -89,43 +94,42 @@ function M.setup(opts)
 		config.on_attach(client, bufnr)
 	end
 
-	-- Build and apply the configuration for a single server. Used by both the
-	-- mason-lspconfig v1 (handlers) and v2 (direct) code paths below.
-	local function configure(name)
-		local setup = config.setup[name] or config.setup["_"]
-		local server = vim.tbl_deep_extend("force", {}, u._server_defaults, config.servers[name] or {})
+	local register_servers = function()
+		-- apply capabilities and on_attach to every server, including those
+		-- installed via Mason but not configured through `servers`
+		if vim.lsp.config and vim.lsp.enable then
+			vim.lsp.config("*", {
+				capabilities = capabilities(),
+				on_attach = on_attach,
+			})
+		end
 
-		local server_config = vim.tbl_deep_extend("force", {
-			capabilities = capabilities,
-			on_attach = on_attach,
-		}, server.config or {})
+		for name, _server in pairs(config.servers) do
+			local setup = config.setup[name] or config.setup["_"]
+			local server = vim.tbl_deep_extend("force", {}, u._server_defaults, _server)
 
-		setup(name, server_config)
-	end
+			local server_config = vim.tbl_deep_extend("force", {
+				capabilities = capabilities(),
+				on_attach = on_attach,
+			}, server.config or {})
 
-	-- setup servers from `servers` option
-	if type(mason_lspconfig.setup_handlers) == "function" then
-		-- mason-lspconfig v1: the default handler runs for every installed server.
-		mason_lspconfig.setup({
-			handlers = {
-				function(name)
-					configure(name)
-				end,
-			},
-		})
-	else
-		-- mason-lspconfig v2 removed the `handlers`/`setup_handlers` mechanism.
-		-- Configure the installed servers directly; `automatic_enable = false`
-		-- leaves enabling to our setup handler (vim.lsp.config + vim.lsp.enable).
-		mason_lspconfig.setup({ automatic_enable = false })
+			setup(name, server_config)
+		end
 
-		for _, name in ipairs(mason_lspconfig.get_installed_servers()) do
-			configure(name)
+		-- `automatic_enable` picks up servers that are installed but not
+		-- configured through `servers`
+		local ok, mason_lspconfig = pcall(require, "mason-lspconfig")
+		if ok and type(mason_lspconfig.setup) == "function" then
+			mason_lspconfig.setup({})
 		end
 	end
 
-	-- install tools
-	installer.setup(config)
+	-- defer the heavy work off the startup path; `vim.lsp.enable` attaches to
+	-- already-open buffers, so late registration is safe
+	vim.schedule(function()
+		register_servers()
+		require("quarry.installer").setup(config)
+	end)
 end
 
 return M

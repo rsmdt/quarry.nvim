@@ -80,6 +80,15 @@ M._features = {
 }
 
 ---@private
+function M._supports_method(client, method)
+	if vim.fn.has("nvim-0.11") == 1 then
+		return client:supports_method(method)
+	end
+
+	return client.supports_method(method)
+end
+
+---@private
 function M._format(features)
 	local _features = {}
 
@@ -109,7 +118,7 @@ function M.setup(client, bufnr, features)
 	for _, config in ipairs(_features) do
 		if
 			type(config.cond) == "boolean" and config.cond
-			or type(config.cond) == "string" and client.supports_method(config.cond)
+			or type(config.cond) == "string" and M._supports_method(client, config.cond)
 			or type(config.cond) == "function" and config.cond(client, bufnr)
 		then
 			local teardown = config.setup(client, bufnr)
